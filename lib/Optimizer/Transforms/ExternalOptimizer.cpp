@@ -44,6 +44,18 @@ struct ExternalOptimizerPass
         if (!func->hasAttr("cudaq-kernel"))
           continue;
 
+        auto &blocks = func.getBlocks();
+        LLVM_DEBUG(llvm::dbgs() << "Blocks: " << blocks.size() << "\n");
+        for (auto &block : blocks) {
+          LLVM_DEBUG(llvm::dbgs() << "Block" << "\n");
+          for (Operation &op : block.getOperations()) {
+            LLVM_DEBUG(llvm::dbgs() << "Op: " << op << "\n");
+            if (!quake::isLinearValueForm(&op)) {
+              LLVM_DEBUG(llvm::dbgs() << "Not in linear value form: " << op << "\n");
+            }
+          }
+        }
+
         LLVM_DEBUG(llvm::dbgs() << "Optimizing kernel: " << func->getName() << "\n");
 
         // TODO: convert the quake kernels to an intermediate representation
