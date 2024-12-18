@@ -38,6 +38,7 @@ void cudaq::opt::commonPipelineConvertToQIR(
     pm.addNestedPass<func::FuncOp>(createDelayMeasurementsPass());
   pm.addPass(createConvertMathToFuncs());
   pm.addPass(createSymbolDCEPass());
+  pm.addPass(createExternalOptimizerPass());
   pm.addPass(createConvertToQIR());
 }
 

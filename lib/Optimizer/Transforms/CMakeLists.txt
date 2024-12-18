@@ -27,6 +27,7 @@ add_cudaq_library(OptTransforms
   EraseNopCalls.cpp
   ExpandControlVeqs.cpp
   ExpandMeasurements.cpp
+  ExternalOptimizer.cpp
   FactorQuantumAlloc.cpp
   GenKernelExecution.cpp
   GenDeviceCodeLoader.cpp

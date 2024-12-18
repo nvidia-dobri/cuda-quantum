@@ -326,6 +326,15 @@ def ExpandMeasurements : Pass<"expand-measurements"> {
   let constructor = "cudaq::opt::createExpandMeasurementsPass()";
 }
 
+def ExternalOptimizer : Pass<"external-optimizer", "mlir::ModuleOp"> {
+  let summary = "Optimize the function using an external optimizer.";
+  let description = [{
+    This pass will optimize kernels using an external optimizer.
+  }];
+  let dependentDialects = ["quake::QuakeDialect"];
+  let constructor = "cudaq::opt::createExternalOptimizerPass()";
+}
+
 def FactorQuantumAllocations :
     Pass<"factor-quantum-alloc", "mlir::func::FuncOp"> {
   let summary = "Factors quake alloca operations.";
