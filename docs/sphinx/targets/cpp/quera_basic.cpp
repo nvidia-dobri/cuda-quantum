@@ -49,8 +49,9 @@ int main() {
   const double delta_start = -5 * omega_max;
   const double delta_end = 5 * omega_max;
 
-  std::vector<double> steps = {0.0, time_ramp, time_max - time_ramp, time_max};
-  cudaq::Schedule schedule(steps, {"t"});
+  std::vector<std::complex<double>> steps = {0.0, time_ramp,
+                                             time_max - time_ramp, time_max};
+  cudaq::Schedule schedule(steps, {"t"}, {});
 
   // Basic Rydberg Hamiltonian
   auto omega = cudaq::scalar_operator(
@@ -78,7 +79,7 @@ int main() {
 
   // Evolve the system
   auto result = cudaq::evolve(hamiltonian, schedule, 10);
-  result.get_sampling_result()->dump();
+  result.get_sampling_result().dump();
 
   return 0;
 }

@@ -72,7 +72,7 @@ evolve(const HamTy &hamiltonian, const std::map<int, int> &dimensions,
        std::initializer_list<ObserveOpTy> observables = {},
        bool store_intermediate_results = false,
        std::optional<int> shots_count = std::nullopt) {
-#if defined(CUDAQ_DYNAMICS_TARGET)
+#if defined(CUDAQ_ANALOG_TARGET)
   return cudaq::__internal__::evolveSingle(
       cudaq::__internal__::convertOp(hamiltonian), dimensions, schedule,
       initial_state, *integrator,
@@ -94,7 +94,7 @@ evolve_result evolve(const HamTy &hamiltonian,
                      const std::vector<ObserveOpTy> &observables = {},
                      bool store_intermediate_results = false,
                      std::optional<int> shots_count = std::nullopt) {
-#if defined(CUDAQ_DYNAMICS_TARGET)
+#if defined(CUDAQ_ANALOG_TARGET)
   return cudaq::__internal__::evolveSingle(
       cudaq::__internal__::convertOp(hamiltonian), dimensions, schedule,
       initial_state, *integrator,
@@ -118,7 +118,7 @@ evolve(const HamTy &hamiltonian, const std::map<int, int> &dimensions,
        std::initializer_list<ObserveOpTy> observables = {},
        bool store_intermediate_results = false,
        std::optional<int> shots_count = std::nullopt) {
-#if defined(CUDAQ_DYNAMICS_TARGET)
+#if defined(CUDAQ_ANALOG_TARGET)
   std::vector<evolve_result> results;
   for (const auto &initial_state : initial_states)
     results.emplace_back(evolve(hamiltonian, dimensions, schedule,
@@ -142,7 +142,7 @@ evolve(const HamTy &hamiltonian, const std::map<int, int> &dimensions,
        const std::vector<ObserveOpTy> &observables = {},
        bool store_intermediate_results = false,
        std::optional<int> shots_count = std::nullopt) {
-#if defined(CUDAQ_DYNAMICS_TARGET)
+#if defined(CUDAQ_ANALOG_TARGET)
   std::vector<evolve_result> results;
   for (const auto &initial_state : initial_states)
     results.emplace_back(evolve(
@@ -168,7 +168,7 @@ evolve_async(const HamTy &hamiltonian, const std::map<int, int> &dimensions,
              std::initializer_list<ObserveOpTy> observables = {},
              bool store_intermediate_results = false,
              std::optional<int> shots_count = std::nullopt, int qpu_id = 0) {
-#if defined(CUDAQ_DYNAMICS_TARGET)
+#if defined(CUDAQ_ANALOG_TARGET)
   if (collapse_operators.size() > 0 && observables.size() > 0) {
     std::vector<CollapseOpTy> collapseOperators(collapse_operators);
     std::vector<ObserveOpTy> observableOperators(observables);
@@ -236,7 +236,7 @@ evolve_async(const HamTy &hamiltonian, const std::map<int, int> &dimensions,
              const std::vector<ObserveOpTy> &observables = {},
              bool store_intermediate_results = false,
              std::optional<int> shots_count = std::nullopt, int qpu_id = 0) {
-#if defined(CUDAQ_DYNAMICS_TARGET)
+#if defined(CUDAQ_ANALOG_TARGET)
   return __internal__::evolve_async(
       [=]() {
         ExecutionContext context("evolve");
@@ -258,5 +258,18 @@ evolve_result evolve(const cudaq::rydberg_hamiltonian &hamiltonian,
                      const Schedule &schedule,
                      std::optional<int> shots_count = std::nullopt) {
   return cudaq::__internal__::evolveSingle(hamiltonian, schedule, shots_count);
+}
+
+async_evolve_result async_evolve(const cudaq::rydberg_hamiltonian &hamiltonian,
+                                 const Schedule &schedule,
+                                 std::optional<int> shots_count = std::nullopt,
+                                 int qpu_id = 0) {
+  return __internal__::evolve_async(
+      [=]() {
+        ExecutionContext context("evolve");
+        cudaq::get_platform().set_exec_ctx(&context, qpu_id);
+        return evolve(hamiltonian, schedule, shots_count);
+      },
+      qpu_id);
 }
 } // namespace cudaq

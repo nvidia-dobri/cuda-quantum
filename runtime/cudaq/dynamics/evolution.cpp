@@ -8,6 +8,7 @@
 
 #include "common/AnalogHamiltonian.h"
 #include "common/EvolveResult.h"
+#include "common/Logger.h"
 #include "cudaq/operators.h"
 #include "cudaq/schedule.h"
 #include <random>
@@ -15,8 +16,9 @@
 #include <string>
 
 namespace cudaq {
-evolve_result
-__internal__::evolveSingle(const cudaq::rydberg_hamiltonian &hamiltonian,
+namespace __internal__ {
+
+evolve_result evolveSingle(const cudaq::rydberg_hamiltonian &hamiltonian,
                            const Schedule &schedule,
                            std::optional<int> shots_count = std::nullopt) {
   auto amp = hamiltonian.get_amplitude();
@@ -27,13 +29,13 @@ __internal__::evolveSingle(const cudaq::rydberg_hamiltonian &hamiltonian,
   std::vector<std::pair<double, double>> dg_ts;
   for (const auto &step : schedule) {
     auto amp_res = amp.evaluate({{"t", step}});
-    amp_ts.push_back(std::make_pair(amp_res.real(), step));
+    amp_ts.push_back(std::make_pair(amp_res.real(), step.real()));
 
     auto ph_res = ph.evaluate({{"t", step}});
-    ph_ts.push_back(std::make_pair(ph_res.real(), step));
+    ph_ts.push_back(std::make_pair(ph_res.real(), step.real()));
 
     auto dg_res = dg.evaluate({{"t", step}});
-    dg_ts.push_back(std::make_pair(dg_res.real(), step));
+    dg_ts.push_back(std::make_pair(dg_res.real(), step.real()));
   }
 
   auto atoms = cudaq::ahs::AtomArrangement();
@@ -82,9 +84,12 @@ __internal__::evolveSingle(const cudaq::rydberg_hamiltonian &hamiltonian,
   ctx->asyncExec = false;
   platform.set_exec_ctx(ctx.get());
 
+  auto programString = programJson.dump();
+  cudaq::info("Program JSON: {}", programString);
+
   auto dynamicResult = cudaq::altLaunchKernel(
       programName.str().c_str(), KernelThunkType(nullptr),
-      (void *)(const_cast<char *>(programJson.dump().c_str())), 0, 0);
+      (void *)(const_cast<char *>(programString.c_str())), 0, 0);
 
   auto sampleResults = ctx->result;
   platform.reset_exec_ctx();
@@ -92,4 +97,5 @@ __internal__::evolveSingle(const cudaq::rydberg_hamiltonian &hamiltonian,
   return evolve_result(sampleResults);
 }
 
+} // namespace __internal__
 } // namespace cudaq

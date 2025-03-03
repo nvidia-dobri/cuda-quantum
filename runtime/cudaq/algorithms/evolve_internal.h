@@ -32,7 +32,7 @@ template <typename QuantumKernel>
 evolve_result evolve(state initial_state, QuantumKernel &&kernel,
                      const std::vector<spin_op> &observables = {},
                      int shots_count = -1) {
-#if defined(CUDAQ_DYNAMICS_TARGET)
+#if defined(CUDAQ_ANALOG_TARGET)
   state final_state =
       get_state(std::forward<QuantumKernel>(kernel), initial_state);
   if (observables.size() == 0)
@@ -61,7 +61,7 @@ template <typename QuantumKernel>
 evolve_result evolve(state initial_state, std::vector<QuantumKernel> kernels,
                      const std::vector<std::vector<spin_op>> &observables = {},
                      int shots_count = -1) {
-#if defined(CUDAQ_DYNAMICS_TARGET)
+#if defined(CUDAQ_ANALOG_TARGET)
   std::vector<state> intermediate_states = {};
   std::vector<std::vector<observe_result>> expectation_values = {};
   int step_idx = -1;
@@ -103,7 +103,7 @@ evolve_async(state initial_state, QuantumKernel &&kernel,
              std::size_t qpu_id = 0,
              std::optional<cudaq::noise_model> noise_model = std::nullopt,
              int shots_count = -1) {
-#if defined(CUDAQ_DYNAMICS_TARGET)
+#if defined(CUDAQ_ANALOG_TARGET)
   auto &platform = cudaq::get_platform();
   std::promise<evolve_result> promise;
   auto f = promise.get_future();
@@ -135,7 +135,7 @@ evolve_async(state initial_state, std::vector<QuantumKernel> kernels,
              std::size_t qpu_id = 0,
              std::optional<cudaq::noise_model> noise_model = std::nullopt,
              int shots_count = -1) {
-#if defined(CUDAQ_DYNAMICS_TARGET)
+#if defined(CUDAQ_ANALOG_TARGET)
   auto &platform = cudaq::get_platform();
   std::promise<evolve_result> promise;
   auto f = promise.get_future();
@@ -162,7 +162,7 @@ evolve_async(state initial_state, std::vector<QuantumKernel> kernels,
 inline async_evolve_result
 evolve_async(std::function<evolve_result()> evolveFunctor,
              std::size_t qpu_id = 0) {
-#if defined(CUDAQ_DYNAMICS_TARGET)
+#if defined(CUDAQ_ANALOG_TARGET)
   auto &platform = cudaq::get_platform();
   if (qpu_id >= platform.num_qpus()) {
     throw std::invalid_argument(
@@ -194,9 +194,10 @@ evolve_result evolveSingle(
     const std::vector<operator_sum<cudaq::matrix_operator>> &observables = {},
     bool store_intermediate_results = false,
     std::optional<int> shots_count = std::nullopt);
-} // namespace __internal__
 
 evolve_result evolveSingle(const cudaq::rydberg_hamiltonian &hamiltonian,
                            const Schedule &schedule,
                            std::optional<int> shots_count = std::nullopt);
+
+} // namespace __internal__
 } // namespace cudaq
