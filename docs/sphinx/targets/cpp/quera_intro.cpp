@@ -51,9 +51,9 @@ int main() {
   const double time_plateau = 7.091995761561453e-08;    // seconds
   const double time_max = 2 * time_ramp + time_plateau; // seconds
 
-  std::vector<double> steps = {0.0, time_ramp, time_ramp + time_plateau,
-                               time_max};
-  cudaq::Schedule schedule(steps, {"t"});
+  std::vector<std::complex<double>> steps = {
+      0.0, time_ramp, time_ramp + time_plateau, time_max};
+  cudaq::Schedule schedule(steps, {"t"}, {});
 
   // Rydberg Hamiltonian with trapezoidal omega
   auto omega = cudaq::scalar_operator(
@@ -81,7 +81,7 @@ int main() {
 
   // Evolve the system
   auto result = cudaq::evolve(hamiltonian, schedule);
-  result.get_sampling_result()->dump();
+  result.get_sampling_result().dump();
 
   return 0;
 }
