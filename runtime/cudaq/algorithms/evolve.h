@@ -135,9 +135,12 @@ evolve(const HamTy &hamiltonian, const std::map<int, int> &dimensions,
 
 template <typename HamTy, typename CollapseOpTy, typename ObserveOpTy>
 std::vector<evolve_result>
+evolve(const OperatorTy &hamiltonian, const std::map<int, int> &dimensions,
 evolve(const HamTy &hamiltonian, const std::map<int, int> &dimensions,
        const Schedule &schedule, const std::vector<state> &initial_states,
        std::shared_ptr<BaseIntegrator> integrator = {},
+       const std::vector<OperatorTy> &collapse_operators = {},
+       const std::vector<OperatorTy> &observables = {},
        const std::vector<CollapseOpTy> &collapse_operators = {},
        const std::vector<ObserveOpTy> &observables = {},
        bool store_intermediate_results = false,
@@ -145,10 +148,10 @@ evolve(const HamTy &hamiltonian, const std::map<int, int> &dimensions,
 #if defined(CUDAQ_DYNAMICS_TARGET)
   std::vector<evolve_result> results;
   for (const auto &initial_state : initial_states)
-    results.emplace_back(evolve(hamiltonian, dimensions, schedule,
-                                initial_state, integrator, collapse_operators,
-                                observables, store_intermediate_results,
-                                shots_count));
+    results.emplace_back(evolve(
+        hamiltonian, dimensions, schedule, initial_states, integrator,
+        collapse_operators, initial_state, integrator, collapse_operators,
+        observables, store_intermediate_results, shots_count));
   return results;
 #else
   static_assert(
@@ -251,5 +254,17 @@ evolve_async(const HamTy &hamiltonian, const std::map<int, int> &dimensions,
       false, "cudaq::evolve is only supported on the 'dynamics' target. Please "
              "recompile your application with '--target dynamics' flag.");
 #endif
+}
+} // namespace cudaq
+
+template <
+    typename OperatorTy,
+    typename = std::enable_if_t<
+        std::is_same_v<std::decay_t<OperatorTy>, cudaq::rydberg_hamiltonian> ||
+        std::is_constructible_v<cudaq::rydberg_hamiltonian, OperatorTy>>>
+// Rydberg Hamiltonian
+evolve_result evolve(const OperatorTy &hamiltonian, const Schedule &schedule,
+                     std::optional<int> shots_count = std::nullopt) {
+  return evolve_single(hamiltonian, schedule, shots_count);
 }
 } // namespace cudaq
