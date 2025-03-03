@@ -15,9 +15,10 @@
 #include <string>
 
 namespace cudaq {
-evolve_result evolve_single(const cudaq::rydberg_hamiltonian &hamiltonian,
-                            const Schedule &schedule,
-                            std::optional<int> shots_count = std::nullopt) {
+evolve_result
+__internal__::evolveSingle(const cudaq::rydberg_hamiltonian &hamiltonian,
+                           const Schedule &schedule,
+                           std::optional<int> shots_count = std::nullopt) {
   auto amp = hamiltonian.get_amplitude();
   auto ph = hamiltonian.get_phase();
   auto dg = hamiltonian.get_delta_global();

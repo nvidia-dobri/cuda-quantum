@@ -257,6 +257,6 @@ evolve_async(const HamTy &hamiltonian, const std::map<int, int> &dimensions,
 evolve_result evolve(const cudaq::rydberg_hamiltonian &hamiltonian,
                      const Schedule &schedule,
                      std::optional<int> shots_count = std::nullopt) {
-  return evolve_single(hamiltonian, schedule, shots_count);
+  return cudaq::__internal__::evolveSingle(hamiltonian, schedule, shots_count);
 }
 } // namespace cudaq

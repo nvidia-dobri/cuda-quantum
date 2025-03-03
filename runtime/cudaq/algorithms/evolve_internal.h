@@ -195,4 +195,8 @@ evolve_result evolveSingle(
     bool store_intermediate_results = false,
     std::optional<int> shots_count = std::nullopt);
 } // namespace __internal__
+
+evolve_result evolveSingle(const cudaq::rydberg_hamiltonian &hamiltonian,
+                           const Schedule &schedule,
+                           std::optional<int> shots_count = std::nullopt);
 } // namespace cudaq

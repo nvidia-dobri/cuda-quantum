@@ -20,6 +20,7 @@ set(CUDAQ_OPS_SRC
   product_operators.cpp
   operator_sum.cpp
   rydberg_hamiltonian.cpp
+  evolution.cpp
   handler.cpp
   schedule.cpp
   helpers.cpp
